@@ -3,19 +3,43 @@ import React, {useState} from 'react';
 
 export function DateTimePretty(Component) {
   return class extends React.Component {
-    
+    constructor(props) {
+        super(props)
+        this.date = this.props.date
+        this.state = {
+            date: this.props.date
+        }
+    }
+
+    timeAgo() {
+        const now = new Date()
+        const uploadTime = new Date(this.date)
+        const diff = (now - uploadTime)
+        if (diff > (365*24*60*60000)) {
+            return Math.floor(diff/(365*24*60*60000)) + " лет назад"
+          } else if (diff > (30*24*60*60000)) {
+            return Math.floor(diff/(30*24*60*60000)) + " месяцев назад"
+          } else if (diff > (24*60*60000)) {
+            return Math.floor(diff/(24*60*60000)) + " дней назад"
+          } else if (diff > (60*60000)) {
+            return Math.floor(diff/(60*60000))  + " часов назад"
+          } else if (diff > 60000) {
+            return Math.floor(diff/60000) + " минут назад"
+          } else if (diff > 1000) {
+            return Math.floor(diff/1000) + " секунд назад"
+          }
+    }
+
+    componentDidMount() {
+        const newOutput = this.timeAgo()
+        this.setState({date: newOutput})
+    }
 
     render() {
-        const differ = new Date().getDate() - new Date(this.props.date).getDate() 
-        const vb = diff + " дней назад"
-        console.log(vb)       
-
-        return <p className="date">{vb}</p>//<Component {...this.props} /*{...this.state}*/ />
+        return <Component date={this.state.date} />
     }
   }
 }
-
-
 
 function DateTime(props) {
     return (
@@ -23,19 +47,19 @@ function DateTime(props) {
     )
 }
 
-const Rr = DateTimePretty(DateTime)
+const PrettierTime = DateTimePretty(DateTime)
 
 function Video(props) {
     return (
         <div className="video">
             <iframe src={props.url} frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-            <Rr date={props.date} />
+            <PrettierTime date={props.date} />
         </div>
     )
 }
 
 function VideoList(props) {
-    return props.list.map(item => <Video url={item.url} date={item.date} />);
+    return props.list.map(item => <Video url={item.url} date={item.date} key={item.url} />);
 }
 
 export default function App() {
